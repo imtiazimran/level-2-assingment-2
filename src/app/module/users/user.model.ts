@@ -14,7 +14,7 @@ const addressShema = new Schema<TAddress>({
 })
 
 const userSchema = new Schema<TUser>({
-    userId: {type: Number, required: true},
+    userId: {type: Number, required: true, unique: true},
     username: {type: String, required: true},
     password: {type: String, required: true},
     fullName: nameSchema,
@@ -26,6 +26,6 @@ const userSchema = new Schema<TUser>({
 })
 
 
-const UserModel = mongoose.model("user", userSchema)
+export const UserModel = mongoose.model("user", userSchema)
 
 
