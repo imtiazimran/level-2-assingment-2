@@ -26,9 +26,18 @@ const userSchema = new Schema<TUser, IUserModel>({
     address: addressShema
 })
 
+// for new document posting
 userSchema.pre("save", async function(next) {
     const currentUser = this
     currentUser.password = await bcrypt.hash(currentUser.password, Number(config.brypt_salt_round))
+    next()
+})
+
+// for updating data
+userSchema.pre("findOneAndUpdate", async function(next) {
+    const currentDocumet : any = this.getUpdate()
+    // console.log(currentDocumet._update);
+    currentDocumet._update.password = await bcrypt.hash(currentDocumet._update.password, Number(config.brypt_salt_round))
     next()
 })
 

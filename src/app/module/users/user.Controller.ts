@@ -3,6 +3,21 @@ import { UserService } from "./user.Service";
 import { UserValidationSchema } from "./user.validation";
 import { UserModel } from "./user.model";
 
+
+
+
+const handleErrorResponce = (res: Response, status: number, message: string, error: any) => {
+    res.status(status).json({
+        success: false,
+        message: message,
+        error: {
+            "code": status,
+            "description": message,
+            error
+        }
+    })
+}
+
 const createUser = async (req: Request, res: Response) => {
     try {
         const newUser = req.body
@@ -17,15 +32,7 @@ const createUser = async (req: Request, res: Response) => {
         })
 
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Something went wrong",
-            error: {
-                "code": 500,
-                "description": "couldn't create user",
-                error
-            }
-        })
+        handleErrorResponce(res, 500, "something went wrong while creating user", error)
     }
 }
 
@@ -38,15 +45,8 @@ const getAllUsers = async (req: Request, res: Response) => {
             data: result
         })
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Something went wrong",
-            error: {
-                "code": 500,
-                "description": "couldn't get  All users",
-                error
-            }
-        })
+
+        handleErrorResponce(res, 404, "coudn't get all users", error)
     }
 
 }
@@ -73,6 +73,24 @@ const getSingleUser = async (req: Request, res: Response) => {
         }
 
     } catch (error) {
+        handleErrorResponce(res, 404, "User not found!", error)
+    }
+
+
+}
+
+// update user
+const updateUser = async (req: Request, res: Response) => {
+    const userId = req.params.userId
+    const newUser = req.body
+    if (await UserModel.isUserExist(userId as unknown as number)) {
+        const result = await UserService.updateUserFromDB(newUser, userId)
+        res.status(200).json({
+            success: true,
+            message:  "User updated successfully!",
+            data: result
+        })
+    } else {
         res.status(404).json({
             "success": false,
             "message": "User not found",
@@ -82,12 +100,13 @@ const getSingleUser = async (req: Request, res: Response) => {
             }
         })
     }
-
-
 }
+
+
 
 export const UserController = {
     createUser,
     getAllUsers,
-    getSingleUser
+    getSingleUser,
+    updateUser
 }
