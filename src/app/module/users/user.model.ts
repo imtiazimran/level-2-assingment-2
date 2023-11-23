@@ -15,40 +15,50 @@ const addressShema = new Schema<TAddress>({
 })
 
 const userSchema = new Schema<TUser, IUserModel>({
-    userId: {type: Number, required: true, unique: true},
-    username: {type: String, required: true, unique: true},
-    password: {type: String, required: true},
+    userId: { type: Number, required: true, unique: true },
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
     fullName: nameSchema,
-    age: {type: Number, required: true},
-    email: {type: String, required: true},
-    isActive: {type: Boolean, default: true},
+    age: { type: Number, required: true },
+    email: { type: String, required: true },
+    isActive: { type: Boolean, default: true },
     hobbies: [String],
-    address: addressShema
+    address: addressShema,
+    isDeleted: { type: Boolean, default: false }
 })
 
 // for new document posting
-userSchema.pre("save", async function(next) {
+userSchema.pre("save", async function (next) {
     const currentUser = this
     currentUser.password = await bcrypt.hash(currentUser.password, Number(config.brypt_salt_round))
     next()
 })
 
 // for updating data
-userSchema.pre("findOneAndUpdate", async function(next) {
-    const currentDocumet : any = this.getUpdate()
+userSchema.pre("findOneAndUpdate", async function (next) {
+    const currentDocumet: any = this.getUpdate()
     // console.log(currentDocumet._update);
     currentDocumet._update.password = await bcrypt.hash(currentDocumet._update.password, Number(config.brypt_salt_round))
     next()
 })
 
-userSchema.methods.toJSON = function(){
+
+// don't show the deleted data 
+userSchema.pre(/^find/, function (next) {
+    const currentDocumet: any = this
+    currentDocumet.find({isDeleted: {$ne: true}})
+    next()
+});
+
+// don't send password field on the response
+userSchema.methods.toJSON = function () {
     const currentUser = this.toObject();
     delete currentUser.password;
     return currentUser
 }
 
-userSchema.statics.isUserExist =async (id:number) => {
-    const user = await UserModel.findOne({userId: id})
+userSchema.statics.isUserExist = async (id: number) => {
+    const user = await UserModel.findOne({ userId: id })
     return user
 }
 

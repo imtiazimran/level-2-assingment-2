@@ -8,12 +8,12 @@ const createUserInDB = async (newUser: TUser) => {
 
 // get all the users 
 const getAllUsersFromDB = async () => {
-    const result = await UserModel.find().select('username fullName age email address')
+    const result = await UserModel.find().select('username fullName age email address -_id')
     return result
 }
 
 // get single user from the database
-const getSingleUserFromDB = async (id: string) => {
+const getSingleUserFromDB = async (id: number) => {
     const result = await UserModel.findOne({ userId: id }).select('-_id')
     return result
 }
@@ -24,9 +24,15 @@ const updateUserFromDB = async (newUser: TUser, id: any) => {
     return result
 }
 
+// delete a user from database 
+const deleteUserFromDB =async (id:number) => {
+    const result = await UserModel.updateOne({userId: id}, {isDeleted: true})
+}
+
 export const UserService = {
     createUserInDB,
     getAllUsersFromDB,
     getSingleUserFromDB,
-    updateUserFromDB
+    updateUserFromDB,
+    deleteUserFromDB
 }

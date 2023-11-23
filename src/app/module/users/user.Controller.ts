@@ -53,7 +53,7 @@ const getAllUsers = async (req: Request, res: Response) => {
 
 const getSingleUser = async (req: Request, res: Response) => {
     try {
-        const userId = req.params.userId
+        const userId = Number(req.params.userId)
         if (await UserModel.isUserExist(userId as unknown as number)) {
             const result = await UserService.getSingleUserFromDB(userId)
             res.status(200).json({
@@ -83,11 +83,12 @@ const getSingleUser = async (req: Request, res: Response) => {
 const updateUser = async (req: Request, res: Response) => {
     const userId = req.params.userId
     const newUser = req.body
-    if (await UserModel.isUserExist(userId as unknown as number)) {
+    try {
+        if (await UserModel.isUserExist(userId as unknown as number)) {
         const result = await UserService.updateUserFromDB(newUser, userId)
         res.status(200).json({
             success: true,
-            message:  "User updated successfully!",
+            message: "User updated successfully!",
             data: result
         })
     } else {
@@ -100,6 +101,38 @@ const updateUser = async (req: Request, res: Response) => {
             }
         })
     }
+    } catch (error) {
+        handleErrorResponce(res, 404, "Error occured while updating user!", error)
+    }
+    
+}
+
+
+
+const deleteUser = async (req: Request, res: Response) => {
+    const userId = Number(req.params.userId)
+    try {
+        if (await UserModel.isUserExist(userId as unknown as number)) {
+            const result = await UserService.deleteUserFromDB(userId)
+            res.status(200).json({
+                "success": true,
+                "message": "User deleted successfully!",
+                "data" : null
+            })
+        } else {
+            res.status(404).json({
+                "success": false,
+                "message": "User not found",
+                "error": {
+                    "code": 404,
+                    "description": "User not found!"
+                }
+            })
+        }
+
+    } catch (error) {
+        handleErrorResponce(res, 404, "User not found!", error)
+    }
 }
 
 
@@ -108,5 +141,6 @@ export const UserController = {
     createUser,
     getAllUsers,
     getSingleUser,
-    updateUser
+    updateUser,
+    deleteUser
 }
