@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { TAddress, TUser, TUserName } from "./user.interface";
+import { IUserModel, TAddress, TUser, TUserName } from "./user.interface";
 import bcrypt from 'bcrypt'
 import config from "../../config";
 
@@ -14,9 +14,9 @@ const addressShema = new Schema<TAddress>({
     country: String
 })
 
-const userSchema = new Schema<TUser>({
+const userSchema = new Schema<TUser, IUserModel>({
     userId: {type: Number, required: true, unique: true},
-    username: {type: String, required: true},
+    username: {type: String, required: true, unique: true},
     password: {type: String, required: true},
     fullName: nameSchema,
     age: {type: Number, required: true},
@@ -38,7 +38,12 @@ userSchema.methods.toJSON = function(){
     return currentUser
 }
 
+userSchema.statics.isUserExist =async (id:number) => {
+    const user = await UserModel.findOne({userId: id})
+    return user
+}
 
-export const UserModel = mongoose.model("user", userSchema)
+
+export const UserModel = mongoose.model<TUser, IUserModel>("user", userSchema)
 
 
