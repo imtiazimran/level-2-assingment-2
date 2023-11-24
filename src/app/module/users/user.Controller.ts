@@ -8,16 +8,22 @@ import { TOrders } from "./user.interface";
 
 
 const handleErrorResponce = (res: Response, status: number, message: string, error: any) => {
-    res.status(status).json({
+    const errorResponse = {
         success: false,
         message: message,
         error: {
-            "code": status,
-            "description": message,
-            error
-        }
-    })
-}
+            code: status,
+            description: message,
+        },
+    };
+
+    if (error && error.code && error.description) {
+        errorResponse.error = { ...error };
+    }
+
+    res.status(status).json(errorResponse);
+};
+
 
 const createUser = async (req: Request, res: Response) => {
     try {
@@ -47,7 +53,7 @@ const getAllUsers = async (req: Request, res: Response) => {
         })
     } catch (error) {
 
-        handleErrorResponce(res, 404, "coudn't get all users", error)
+        handleErrorResponce(res, 500, "coudn't get all users", error)
     }
 
 }
@@ -63,14 +69,7 @@ const getSingleUser = async (req: Request, res: Response) => {
                 data: result
             })
         } else {
-            res.status(404).json({
-                "success": false,
-                "message": "User not found",
-                "error": {
-                    "code": 404,
-                    "description": "User not found!"
-                }
-            })
+            handleErrorResponce(res, 404, "User not found", { code: 404, description: "User not found" })
         }
 
     } catch (error) {
@@ -86,26 +85,19 @@ const updateUser = async (req: Request, res: Response) => {
     const newUser = req.body
     try {
         if (await UserModel.isUserExist(userId as unknown as number)) {
-        const result = await UserService.updateUserFromDB(newUser, userId)
-        res.status(200).json({
-            success: true,
-            message: "User updated successfully!",
-            data: result
-        })
-    } else {
-        res.status(404).json({
-            "success": false,
-            "message": "User not found",
-            "error": {
-                "code": 404,
-                "description": "User not found!"
-            }
-        })
-    }
+            const result = await UserService.updateUserFromDB(newUser, userId)
+            res.status(200).json({
+                success: true,
+                message: "User updated successfully!",
+                data: result
+            })
+        } else {
+            handleErrorResponce(res, 404, "User not found", { code: 404, description: "User not found" })
+        }
     } catch (error) {
         handleErrorResponce(res, 404, "Error occured while updating user!", error)
     }
-    
+
 }
 
 
@@ -118,17 +110,10 @@ const deleteUser = async (req: Request, res: Response) => {
             res.status(200).json({
                 "success": true,
                 "message": "User deleted successfully!",
-                "data" : null
+                "data": null
             })
         } else {
-            res.status(404).json({
-                "success": false,
-                "message": "User not found",
-                "error": {
-                    "code": 404,
-                    "description": "User not found!"
-                }
-            })
+            handleErrorResponce(res, 404, "User not found", { code: 404, description: "User not found" })
         }
 
     } catch (error) {
@@ -137,33 +122,61 @@ const deleteUser = async (req: Request, res: Response) => {
 }
 
 
-const addOrder =async (req: Request, res: Response) => {
+const addOrder = async (req: Request, res: Response) => {
     const userId = Number(req.params.userId)
-    const order : TOrders = req.body
-        try {
-            if (await UserModel.isUserExist(userId as unknown as number)) {
-                const result = await UserService.addOrdersInDB(order, userId )
-                res.status(200).json({
-                    "success": true,
-                    "message": "Order created successfully!",
-                    "data": null
-                })
-            } else {
-                res.status(404).json({
-                    "success": false,
-                    "message": "User not found",
-                    "error": {
-                        "code": 404,
-                        "description": "User not found!"
-                    }
-                })
-            }
-        } catch (error) {
-            handleErrorResponce(res, 404, "User not found!", error)
+    const order: TOrders = req.body
+    try {
+        if (await UserModel.isUserExist(userId as unknown as number)) {
+            const result = await UserService.addOrdersInDB(order, userId)
+            res.status(200).json({
+                "success": true,
+                "message": "Order created successfully!",
+                "data": null
+            })
+        } else {
+            handleErrorResponce(res, 404, "User not found", { code: 404, description: "User not found" })
         }
+    } catch (error) {
+        handleErrorResponce(res, 500, "Internal Server Erorr", error)
+    }
 }
 
 
+const getUserOrders = async (req: Request, res: Response) => {
+    const userId = Number(req.params.userId);
+    try {
+        if (await UserModel.isUserExist(userId as unknown as number)) {
+            const result = await UserService.getUserOrdersFromDB(userId)
+            res.status(200).json({
+                "success": true,
+                "message": "Order fetched successfully!",
+                "data": result
+            })
+        } else {
+            handleErrorResponce(res, 404, "User not found", { code: 404, description: "User not found" })
+        }
+    } catch (error) {
+        handleErrorResponce(res, 500, "Internal Server Erorr", error)
+    }
+}
+
+const totalPrice = async (req: Request, res: Response) => {
+    const userId = Number(req.params.userId);
+    try {
+        if (await UserModel.isUserExist(userId as unknown as number)) {
+            const result = await UserService.totalPrice(userId)
+            res.status(200).json({
+                "success": true,
+                "message": "Total price calculated successfully!",
+                "data": result
+            })
+        } else {
+            handleErrorResponce(res, 404, "User not found", { code: 404, description: "User not found" })
+        }
+    } catch (error) {
+        handleErrorResponce(res, 500, "Internal Server Erorr", error)
+    }
+}
 
 export const UserController = {
     createUser,
@@ -171,5 +184,7 @@ export const UserController = {
     getSingleUser,
     updateUser,
     deleteUser,
-    addOrder
+    addOrder,
+    getUserOrders,
+    totalPrice
 }

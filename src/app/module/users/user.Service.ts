@@ -14,7 +14,7 @@ const getAllUsersFromDB = async () => {
 
 // get single user from the database
 const getSingleUserFromDB = async (id: number) => {
-    const result = await UserModel.findOne({ userId: id }).select('-_id')
+    const result = await UserModel.findOne({ userId: id }).select('-_id -orders -isDeleted -__v')
     return result
 }
 
@@ -40,18 +40,43 @@ const addOrdersInDB = async (order: TOrders, id: number) => {
 
     if (!user.orders || !Array.isArray(user.orders)) {
         user.orders = [order]
-    }else{
+    } else {
         user.orders.push(order)
     }
     const result = await user.save()
     return result
 }
 
+
+// get orders by user 
+const getUserOrdersFromDB = async (id: number) => {
+    const user = await UserModel.findOne({ userId: id })
+    return user?.orders
+}
+
+// canculate total price of all the products of a user
+const totalPrice = async (id: number) => {
+    const result = await UserModel.aggregate([
+        { $match: { userId: id } },
+        { $unwind: "$orders" },
+        {
+            $group: {
+                _id: null,
+                totalPrice: {
+                    $sum: { $multiply: ['$orders.price', '$orders.quantity'] }
+                }
+            }
+        }
+    ])
+    return result
+}
 export const UserService = {
     createUserInDB,
     getAllUsersFromDB,
     getSingleUserFromDB,
     updateUserFromDB,
     deleteUserFromDB,
-    addOrdersInDB
+    addOrdersInDB,
+    getUserOrdersFromDB,
+    totalPrice
 }
