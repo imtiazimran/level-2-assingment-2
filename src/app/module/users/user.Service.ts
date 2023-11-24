@@ -66,9 +66,15 @@ const totalPrice = async (id: number) => {
                     $sum: { $multiply: ['$orders.price', '$orders.quantity'] }
                 }
             }
+        },
+        {
+            $project: {
+                _id: 0,
+                totalPrice: 1
+            }
         }
     ])
-    return result
+    return result[0]
 }
 export const UserService = {
     createUserInDB,
