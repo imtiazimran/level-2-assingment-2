@@ -35,7 +35,23 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(200).json({
             success: true,
             message: 'User Created sucessfully',
-            data: result
+            data: {
+                userId: result.userId,
+                username: result.username,
+                fullName: {
+                    firstName: result.fullName.firstName,
+                    lastName: result.fullName.lastName,
+                },
+                age: result.age,
+                email: result.email,
+                isActive: result.isActive,
+                hobbies: result.hobbies,
+                address: {
+                    street: result.address.street,
+                    city: result.address.city,
+                    country: result.address.country,
+                }
+            }
         });
     }
     catch (error) {
@@ -77,10 +93,11 @@ const getSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 // update user
 const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.userId;
-    const newUser = req.body;
+    const updatedUserData = req.body;
+    console.log(updatedUserData);
     try {
         if (yield user_model_1.UserModel.isUserExist(userId)) {
-            const result = yield user_Service_1.UserService.updateUserFromDB(newUser, userId);
+            const result = yield user_Service_1.UserService.updateUserFromDB(updatedUserData, userId);
             res.status(200).json({
                 success: true,
                 message: "User updated successfully!",
@@ -92,7 +109,8 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         }
     }
     catch (error) {
-        handleErrorResponce(res, 404, "Error occured while updating user!", error);
+        // console.log(error.message);
+        handleErrorResponce(res, 500, `${error.message}`, error);
     }
 });
 const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

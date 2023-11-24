@@ -15,9 +15,9 @@ const addressShema = new Schema<TAddress>({
 })
 
 const orderSchema = new Schema<TOrders>({
-        productName: String,
-        price: Number,
-        quantity: Number
+    productName: String,
+    price: Number,
+    quantity: Number
 })
 
 const userSchema = new Schema<TUser, IUserModel>({
@@ -43,17 +43,31 @@ userSchema.pre("save", async function (next) {
 
 // for updating data
 userSchema.pre("findOneAndUpdate", async function (next) {
-    const currentDocumet: any = this.getUpdate()
-    // console.log(currentDocumet._update);
-    currentDocumet._update.password = await bcrypt.hash(currentDocumet._update.password, Number(config.brypt_salt_round))
-    next()
-})
+    try {
+        const update = this.getUpdate();
+        const { password, ...rest } = update; // Destructure password and other fields
+        const hashedPassword = password ? await bcrypt.hash(password, Number(config.brypt_salt_round)) : undefined;
+        
+        if (hashedPassword) {
+            // Update the 'password' field in the update object with the hashed password
+            this.setUpdate({ ...rest, password: hashedPassword });
+        }
+    } catch (error) {
+        console.error(error);
+    }
+    next();
+});
+
+
+
+
+
 
 
 // don't show the deleted data 
 userSchema.pre(/^find/, function (next) {
     const currentDocumet: any = this
-    currentDocumet.find({isDeleted: {$ne: true}})
+    currentDocumet.find({ isDeleted: { $ne: true } })
     next()
 });
 

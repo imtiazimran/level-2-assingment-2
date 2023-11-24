@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { UserService } from "./user.Service";
 import { UserValidationSchema } from "./user.validation";
 import { UserModel } from "./user.model";
-import { TOrders } from "./user.interface";
+import { TOrders, TUser } from "./user.interface";
 
 
 
@@ -98,21 +98,37 @@ const getSingleUser = async (req: Request, res: Response) => {
 // update user
 const updateUser = async (req: Request, res: Response) => {
     const userId = req.params.userId
-    const newUser = req.body
+    const updatedUserData = req.body
     try {
         if (await UserModel.isUserExist(userId as unknown as number)) {
-            const result = await UserService.updateUserFromDB(newUser, userId)
+            const result = await UserService.updateUserFromDB(updatedUserData, userId)
             res.status(200).json({
                 success: true,
                 message: "User updated successfully!",
-                data: result
+                data: {
+                    userId: updatedUserData.userId,
+                    username: updatedUserData.username,
+                    fullName: {
+                        firstName: updatedUserData.fullName.firstName,
+                        lastName: updatedUserData.fullName.lastName,
+                    },
+                    age: updatedUserData.age,
+                    email: updatedUserData.email,
+                    isActive: updatedUserData.isActive,
+                    hobbies: updatedUserData.hobbies,
+                    address: {
+                        street: updatedUserData.address.street,
+                        city: updatedUserData.address.city,
+                        country: updatedUserData.address.country,
+                    }
+                }
             })
         } else {
             handleErrorResponce(res, 404, "User not found", { code: 404, description: "User not found" })
         }
-    } catch (error) {
-        // console.log(error.message);
-        handleErrorResponce(res, 500, `${error.message}`, error)
+    } catch (error: any) {
+        console.log(error);
+        handleErrorResponce(res, 500, `${error}`, error)
     }
 
 }
