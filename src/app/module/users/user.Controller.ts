@@ -35,7 +35,23 @@ const createUser = async (req: Request, res: Response) => {
         res.status(200).json({
             success: true,
             message: 'User Created sucessfully',
-            data: result
+            data: {
+                userId: result.userId,
+                username: result.username,
+                fullName: {
+                    firstName: result.fullName.firstName,
+                    lastName: result.fullName.lastName,
+                },
+                age: result.age,
+                email: result.email,
+                isActive: result.isActive,
+                hobbies: result.hobbies,
+                address: {
+                    street: result.address.street,
+                    city: result.address.city,
+                    country: result.address.country,
+                }
+            }
         })
 
     } catch (error) {
@@ -95,7 +111,8 @@ const updateUser = async (req: Request, res: Response) => {
             handleErrorResponce(res, 404, "User not found", { code: 404, description: "User not found" })
         }
     } catch (error) {
-        handleErrorResponce(res, 404, "Error occured while updating user!", error)
+        // console.log(error.message);
+        handleErrorResponce(res, 500, `${error.message}`, error)
     }
 
 }
