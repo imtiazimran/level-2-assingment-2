@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { UserService } from "./user.Service";
 import { UserValidationSchema } from "./user.validation";
 import { UserModel } from "./user.model";
+import { TOrders } from "./user.interface";
 
 
 
@@ -136,11 +137,39 @@ const deleteUser = async (req: Request, res: Response) => {
 }
 
 
+const addOrder =async (req: Request, res: Response) => {
+    const userId = Number(req.params.userId)
+    const order : TOrders = req.body
+        try {
+            if (await UserModel.isUserExist(userId as unknown as number)) {
+                const result = await UserService.addOrdersInDB(order, userId )
+                res.status(200).json({
+                    "success": true,
+                    "message": "Order created successfully!",
+                    "data": null
+                })
+            } else {
+                res.status(404).json({
+                    "success": false,
+                    "message": "User not found",
+                    "error": {
+                        "code": 404,
+                        "description": "User not found!"
+                    }
+                })
+            }
+        } catch (error) {
+            handleErrorResponce(res, 404, "User not found!", error)
+        }
+}
+
+
 
 export const UserController = {
     createUser,
     getAllUsers,
     getSingleUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    addOrder
 }
