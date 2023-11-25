@@ -9,7 +9,7 @@ This is a Node.js Express application that manages user data and orders, utilizi
 1. Clone the repository:
 
    ```bash
-   git clone <https://github.com/imtiazimran/level-2-assingment-2.git>
+   git clone [From here](https://github.com/imtiazimran/level-2-assingment-2.git)
    ```
 
 2. Install dependencies:
@@ -25,7 +25,7 @@ This is a Node.js Express application that manages user data and orders, utilizi
    npm start
    ```
 
-4. The server runs at `http://localhost:5000/`
+4. The server runs at [http://localhost:5000/](http://localhost:5000/)
 
 5. Use a tool like Postman or a web browser to test the API endpoints.
 
