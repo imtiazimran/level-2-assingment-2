@@ -42,17 +42,17 @@ const config_1 = __importDefault(require("../../config"));
 const nameSchema = new mongoose_1.Schema({
     firstName: String,
     lastName: String
-});
+}, { _id: false });
 const addressShema = new mongoose_1.Schema({
     street: String,
     city: String,
     country: String
-});
+}, { _id: false });
 const orderSchema = new mongoose_1.Schema({
     productName: String,
     price: Number,
-    quantity: Number
-});
+    quantity: Number,
+}, { _id: false });
 const userSchema = new mongoose_1.Schema({
     userId: { type: Number, required: true, unique: true },
     username: { type: String, required: true, unique: true },
