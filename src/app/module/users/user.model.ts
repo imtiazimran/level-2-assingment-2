@@ -7,19 +7,19 @@ import config from "../../config";
 const nameSchema = new Schema<TUserName>({
     firstName: String,
     lastName: String
-})
+}, {_id:false})
 
 const addressShema = new Schema<TAddress>({
     street: String,
     city: String,
     country: String
-})
+}, {_id: false})
 
 const orderSchema = new Schema<TOrders>({
     productName: String,
     price: Number,
-    quantity: Number
-})
+    quantity: Number,
+},{_id: false})
 
 const userSchema = new Schema<TUser, IUserModel>({
     userId: { type: Number, required: true, unique: true },

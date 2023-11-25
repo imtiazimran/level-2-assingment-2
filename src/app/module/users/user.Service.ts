@@ -21,7 +21,6 @@ const getSingleUserFromDB = async (id: number) => {
 // update a user informatin
 const updateUserFromDB = async (updatedUserData: TUser, id: any) => {
     const result = await UserModel.findOneAndUpdate({ userId: id }, updatedUserData, {new: true}).select('-_id')
-    console.log("service",result)
     return result
 }
 

@@ -51,7 +51,7 @@ const createUser = async (req: Request, res: Response) => {
                     city: result.address.city,
                     country: result.address.country,
                 }
-            }
+            } 
         })
 
     } catch (error) {
@@ -121,7 +121,7 @@ const updateUser = async (req: Request, res: Response) => {
                         city: updatedUserData.address.city,
                         country: updatedUserData.address.country,
                     }
-                }
+                } 
             })
         } else {
             handleErrorResponce(res, 404, "User not found", { code: 404, description: "User not found" })
