@@ -9,7 +9,7 @@ This is a Node.js Express application that manages user data and orders, utilizi
 1. Clone the repository:
 
    ```bash
-   git clone [From here](https://github.com/imtiazimran/level-2-assingment-2.git)
+   git clone [Here](https://github.com/imtiazimran/level-2-assingment-2.git)
    ```
 
 2. Install dependencies:
