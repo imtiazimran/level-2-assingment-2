@@ -27,8 +27,9 @@ const getSingleUserFromDB = (id) => __awaiter(void 0, void 0, void 0, function* 
     return result;
 });
 // update a user informatin
-const updateUserFromDB = (newUser, id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.UserModel.findOneAndUpdate({ userId: id }, newUser).select('-_id');
+const updateUserFromDB = (updatedUserData, id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_model_1.UserModel.findOneAndUpdate({ userId: id }, updatedUserData, { new: true }).select('-_id');
+    console.log("service", result);
     return result;
 });
 // delete a user from database 

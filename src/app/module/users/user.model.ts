@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import { Document, Query } from 'mongoose'; 
 import { IUserModel, TAddress, TOrders, TUser, TUserName } from "./user.interface";
 import bcrypt from 'bcrypt'
 import config from "../../config";
@@ -42,24 +43,13 @@ userSchema.pre("save", async function (next) {
 })
 
 // for updating data
-userSchema.pre("findOneAndUpdate", async function (next) {
-    try {
-        const update = this.getUpdate();
-        const { password, ...rest } = update; // Destructure password and other fields
-        const hashedPassword = password ? await bcrypt.hash(password, Number(config.brypt_salt_round)) : undefined;
-        
-        if (hashedPassword) {
-            // Update the 'password' field in the update object with the hashed password
-            this.setUpdate({ ...rest, password: hashedPassword });
-        }
-    } catch (error) {
-        console.error(error);
+userSchema.pre("findOneAndUpdate", async function (this: any, next) {
+    const currentUser: any = this.getUpdate();
+    if (currentUser.password) {
+        currentUser.password = await bcrypt.hash(currentUser.password, Number(config.brypt_salt_round));
     }
     next();
 });
-
-
-
 
 
 

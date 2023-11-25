@@ -94,14 +94,29 @@ const getSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.userId;
     const updatedUserData = req.body;
-    console.log(updatedUserData);
     try {
         if (yield user_model_1.UserModel.isUserExist(userId)) {
             const result = yield user_Service_1.UserService.updateUserFromDB(updatedUserData, userId);
             res.status(200).json({
                 success: true,
                 message: "User updated successfully!",
-                data: result
+                data: {
+                    userId: updatedUserData.userId,
+                    username: updatedUserData.username,
+                    fullName: {
+                        firstName: updatedUserData.fullName.firstName,
+                        lastName: updatedUserData.fullName.lastName,
+                    },
+                    age: updatedUserData.age,
+                    email: updatedUserData.email,
+                    isActive: updatedUserData.isActive,
+                    hobbies: updatedUserData.hobbies,
+                    address: {
+                        street: updatedUserData.address.street,
+                        city: updatedUserData.address.city,
+                        country: updatedUserData.address.country,
+                    }
+                }
             });
         }
         else {
@@ -109,8 +124,8 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         }
     }
     catch (error) {
-        // console.log(error.message);
-        handleErrorResponce(res, 500, `${error.message}`, error);
+        console.log(error);
+        handleErrorResponce(res, 500, `${error}`, error);
     }
 });
 const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

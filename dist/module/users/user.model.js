@@ -77,9 +77,10 @@ userSchema.pre("save", function (next) {
 // for updating data
 userSchema.pre("findOneAndUpdate", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
-        const currentDocumet = this.getUpdate();
-        // console.log(currentDocumet._update);
-        currentDocumet._update.password = yield bcrypt_1.default.hash(currentDocumet._update.password, Number(config_1.default.brypt_salt_round));
+        const currentUser = this.getUpdate();
+        if (currentUser.password) {
+            currentUser.password = yield bcrypt_1.default.hash(currentUser.password, Number(config_1.default.brypt_salt_round));
+        }
         next();
     });
 });
